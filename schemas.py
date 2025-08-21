@@ -18,6 +18,7 @@ class UserBase(BaseModel):
     name: str
     email: EmailStr
     phone: str
+    password: str
     reminder_type: str = "both"
 
 class UserCreate(UserBase):

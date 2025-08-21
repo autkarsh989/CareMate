@@ -9,6 +9,7 @@ class User(Base):
     name = Column(String)
     email = Column(String)
     phone = Column(String)
+    password = Column(String)
     reminder_type = Column(String, default="both")  # email, call, both
 
     prescriptions = relationship("Prescription", back_populates="user")
