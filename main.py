@@ -10,6 +10,9 @@ from reminder import scheduler
 from call_utils import make_call
 from email_utils import send_email
 
+from config import GEMINI_API_KEY
+import requests
+
 
 # JWT and password hashing setup
 SECRET_KEY = "your_secret_key_here"
@@ -125,3 +128,46 @@ def add_text_to_user_db(
         return {"status": "success", "user_id": current_user.id, "added_text": text, "full_text": user_text.text}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to write to database: {e}")
+
+
+
+# New endpoint: Add text to user-specific database row
+@app.post("/user/text")
+def add_text_to_user_db(
+    text: str = Body(..., embed=True),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    try:
+        user_text = crud.add_or_append_user_text(db, current_user.id, text)
+        return {"status": "success", "user_id": current_user.id, "added_text": text, "full_text": user_text.text}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to write to database: {e}")
+
+
+# New endpoint: Ask a question using user's stored text and Gemini AI
+@app.post("/user/ask")
+def ask_question(
+    question: str = Body(..., embed=True),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    user_text_obj = crud.get_user_text(db, current_user.id)
+    user_text = user_text_obj.text if user_text_obj and user_text_obj.text else ""
+    prompt = f"User's notes: {user_text}\nQuestion: {question}"
+
+    # Call Gemini AI (replace with actual API endpoint and key)
+    GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
+    # GEMINI_API_KEY = "gemini-key"  # Put your Gemini API key here
+    headers = {"Content-Type": "application/json"}
+    payload = {
+        "contents": [{"parts": [{"text": prompt}]}]
+    }
+    try:
+        response = requests.post(f"{GEMINI_API_URL}?key={GEMINI_API_KEY}", json=payload, headers=headers)
+        response.raise_for_status()
+        ai_answer = response.json()["candidates"][0]["content"]["parts"][0]["text"]
+        print(ai_answer)
+        return {"answer": ai_answer}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"AI request failed: {e}")
