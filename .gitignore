@@ -19,5 +19,4 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
-test.txt
 user_texts/
