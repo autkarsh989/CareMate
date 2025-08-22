@@ -165,9 +165,7 @@ def ask_question(
     user_text = user_text_obj.text if user_text_obj and user_text_obj.text else ""
     prompt = f"User's notes: {user_text}\nQuestion: {question}"
     
-    # Call Gemini AI (replace with actual API endpoint and key)
     GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
-    # GEMINI_API_KEY = "gemini-key"  # Put your Gemini API key here
     headers = {"Content-Type": "application/json"}
     payload = {
         "contents": [{"parts": [{"text": prompt}]}]
@@ -177,10 +175,15 @@ def ask_question(
         response.raise_for_status()
         ai_answer = response.json()["candidates"][0]["content"]["parts"][0]["text"]
         print(ai_answer)
-        return {"answer": ai_answer}
+
+        # ✅ Make a call with AI response
+        make_call(current_user.phone, ai_answer)
+
+        return {"answer": ai_answer, "call_status": "Call initiated to user with AI response"}
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"AI request failed: {e}")
-    
+        raise HTTPException(status_code=500, detail=f"AI request or call failed: {e}")
+
 @app.get("/queue-status")
 def queue_status():
     return {"queue_size": reminder_queue.qsize()}

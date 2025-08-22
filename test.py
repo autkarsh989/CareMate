@@ -40,7 +40,7 @@ def add_prescription(token):
     data = {
         "medicine_name": "Ibuprofen",
         "dosage": "200mg",
-        "timings": "05:00,17:33"
+        "timings": "05:00,20:01"
     }
     resp = requests.post(f"{BASE_URL}/prescriptions/add", json=data, headers=headers)
     print("Add Prescription:", resp.status_code, resp.json())
