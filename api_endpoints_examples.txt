@@ -1,0 +1,190 @@
+# API Endpoints Documentation
+
+This file explains all main API endpoints in the project, with example data and request/response formats. Phone numbers use the +91 prefix.
+
+---
+
+## 1. Register User
+**Endpoint:**
+```
+POST /users/
+Content-Type: application/json
+```
+**Request Example:**
+```
+{
+  "name": "Akash",
+  "email": "akash@example.com",
+  "phone": "+919876543210",
+  "password": "mypassword",
+  "reminder_type": "both",
+  "prescriptions": [
+    {
+      "medicine_name": "Paracetamol",
+      "dosage": "500mg",
+      "timings": "09:00,14:00,21:00"
+    }
+  ]
+}
+```
+**Response Example:**
+```
+{
+  "id": 1,
+  "name": "Akash",
+  "email": "akash@example.com",
+  "phone": "+919876543210",
+  "reminder_type": "both",
+  "prescriptions": [ ... ]
+}
+```
+
+---
+
+## 2. Login
+**Endpoint:**
+```
+POST /token
+Content-Type: application/x-www-form-urlencoded
+```
+**Request Example:**
+```
+username=akash@example.com&password=mypassword
+```
+**Response Example:**
+```
+{
+  "access_token": "your_jwt_token",
+  "token_type": "bearer"
+}
+```
+
+---
+
+## 3. Add Prescription
+**Endpoint:**
+```
+POST /prescriptions/add
+Authorization: Bearer <your_jwt_token>
+Content-Type: application/json
+```
+**Request Example:**
+```
+{
+  "medicine_name": "Ibuprofen",
+  "dosage": "200mg",
+  "timings": "08:00,20:00"
+}
+```
+**Response Example:**
+```
+{
+  "id": 2,
+  "medicine_name": "Ibuprofen",
+  "dosage": "200mg",
+  "timings": "08:00,20:00",
+  "user_id": 1
+}
+```
+
+---
+
+## 4. Add User Text
+**Endpoint:**
+```
+POST /user/text
+Authorization: Bearer <your_jwt_token>
+Content-Type: application/json
+```
+**Request Example:**
+```
+{
+  "text": "I have put the high school marksheet in the almirah locker."
+}
+```
+**Response Example:**
+```
+{
+  "status": "success",
+  "user_id": 1,
+  "added_text": "I have put the high school marksheet in the almirah locker.",
+  "full_text": "I have put the high school marksheet in the almirah locker.\n"
+}
+```
+
+---
+
+## 5. Ask AI (Gemini)
+**Endpoint:**
+```
+POST /user/ask
+Authorization: Bearer <your_jwt_token>
+Content-Type: application/json
+```
+**Request Example:**
+```
+{
+  "question": "Where did I keep my marksheet?"
+}
+```
+**Response Example:**
+```
+{
+  "answer": "You kept your marksheet in the almirah locker."
+}
+```
+
+---
+
+## 6. Test Call
+**Endpoint:**
+```
+POST /test/call
+Content-Type: application/json
+```
+**Request Example:**
+```
+{
+  "phone": "+919876543210",
+  "message": "This is a test call from Medicine Reminder system."
+}
+```
+**Response Example:**
+```
+{
+  "status": "Call initiated",
+  "to": "+919876543210",
+  "message": "This is a test call from Medicine Reminder system."
+}
+```
+
+---
+
+## 7. Test Email
+**Endpoint:**
+```
+POST /test/email
+Content-Type: application/json
+```
+**Request Example:**
+```
+{
+  "email": "akash@example.com",
+  "message": "This is a test email from Medicine Reminder system."
+}
+```
+**Response Example:**
+```
+{
+  "status": "Email sent",
+  "to": "akash@example.com",
+  "message": "This is a test email from Medicine Reminder system."
+}
+```
+
+---
+
+**Notes:**
+- All phone numbers should use the +91 prefix (e.g., +919876543210).
+- Endpoints requiring authentication need a valid JWT token in the Authorization header.
+- Data shown is for example purposes; adapt as needed for your use case.
