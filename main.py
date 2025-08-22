@@ -70,7 +70,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 
 
 # Registration endpoint (hash password before saving)
-@app.post("/users/", response_model=schemas.UserOut)
+@app.post("/users", response_model=schemas.UserOut)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     user.password = get_password_hash(user.password)
     return crud.create_user(db, user)
@@ -105,29 +105,22 @@ def add_prescription(prescription: schemas.PrescriptionCreate, db: Session = Dep
 
 # ✅ Test calling endpoint
 @app.post("/test/call")
-def test_call(phone: str, message: str = "This is a test call from Medicine Reminder system."):
+def test_call(
+    phone: str = Body(...),
+    message: str = Body("This is a test call from Medicine Reminder system.")
+):
     make_call(phone, message)
     return {"status": "Call initiated", "to": phone, "message": message}
 
 # ✅ Test email endpoint
+
 @app.post("/test/email")
-def test_email(email: str, message: str = "This is a test email from Medicine Reminder system."):
+def test_email(
+    email: str = Body(...),
+    message: str = Body("This is a test email from Medicine Reminder system.")
+):
     send_email(email, "Test Reminder", message)
     return {"status": "Email sent", "to": email, "message": message}
-
-
-# New endpoint: Add text to user-specific database row
-@app.post("/user/text")
-def add_text_to_user_db(
-    text: str = Body(..., embed=True),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    try:
-        user_text = crud.add_or_append_user_text(db, current_user.id, text)
-        return {"status": "success", "user_id": current_user.id, "added_text": text, "full_text": user_text.text}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to write to database: {e}")
 
 
 
@@ -155,7 +148,7 @@ def ask_question(
     user_text_obj = crud.get_user_text(db, current_user.id)
     user_text = user_text_obj.text if user_text_obj and user_text_obj.text else ""
     prompt = f"User's notes: {user_text}\nQuestion: {question}"
-
+    
     # Call Gemini AI (replace with actual API endpoint and key)
     GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
     # GEMINI_API_KEY = "gemini-key"  # Put your Gemini API key here
