@@ -3,13 +3,13 @@ import requests
 
 BASE_URL = "http://localhost:8000"  # Change if your server runs elsewhere
 EMAIL = "satyampathak67@gmail.com"
-PHONE_NUMBER = "+916388494727"  # Replace with your actual number
+PHONE_NUMBER = "+916388495727"  # Replace with your actual number
 PASSWORD = "testpass123"
 
 # --- 1. Register User ---
 def register_user():
     data = {
-        "name": "Satyam",
+        "name": "Satyampathak",
         "email": EMAIL,
         "phone": PHONE_NUMBER,
         "password": PASSWORD,
@@ -40,7 +40,7 @@ def add_prescription(token):
     data = {
         "medicine_name": "Ibuprofen",
         "dosage": "200mg",
-        "timings": "08:00,20:00"
+        "timings": "05:00,17:33"
     }
     resp = requests.post(f"{BASE_URL}/prescriptions/add", json=data, headers=headers)
     print("Add Prescription:", resp.status_code, resp.json())

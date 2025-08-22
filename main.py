@@ -6,12 +6,15 @@ from sqlalchemy.orm import Session
 from database import Base, engine, get_db
 from models import User, Prescription
 import crud, schemas
-from reminder import scheduler
 from call_utils import make_call
 from email_utils import send_email
 
 from config import GEMINI_API_KEY
 import requests
+
+from reminder import reminder_queue, producer, consumer
+import threading
+from apscheduler.schedulers.background import BackgroundScheduler
 
 
 # JWT and password hashing setup
@@ -25,6 +28,19 @@ Base.metadata.create_all(bind=engine)
 
 
 app = FastAPI(title="Medicine Reminder API")
+scheduler=None
+
+@app.on_event("startup")
+def start_services():
+    # Start the consumer thread (runs forever)
+    threading.Thread(target=consumer, daemon=True).start()
+
+    # Schedule the producer to run every minute
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(producer, "cron", minute="*")
+    scheduler.start()
+    app.state.scheduler = scheduler
+
 
 # Utility functions for authentication
 def verify_password(plain_password, hashed_password):
@@ -164,3 +180,7 @@ def ask_question(
         return {"answer": ai_answer}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI request failed: {e}")
+    
+@app.get("/queue-status")
+def queue_status():
+    return {"queue_size": reminder_queue.qsize()}
