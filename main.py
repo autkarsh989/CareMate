@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Body
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -82,9 +82,9 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@app.get("/users/", response_model=list[schemas.UserOut])
-def list_users(db: Session = Depends(get_db)):
-    return crud.get_users(db)
+# @app.get("/users/", response_model=list[schemas.UserOut])
+# def list_users(db: Session = Depends(get_db)):
+#     return crud.get_users(db)
 
 # Protected endpoint example: only logged-in users can add medicine
 @app.post("/prescriptions/add")
@@ -111,3 +111,21 @@ def test_call(phone: str, message: str = "This is a test call from Medicine Remi
 def test_email(email: str, message: str = "This is a test email from Medicine Reminder system."):
     send_email(email, "Test Reminder", message)
     return {"status": "Email sent", "to": email, "message": message}
+
+
+# New endpoint: Add text to user-specific file
+@app.post("/user/text")
+def add_text_to_user_file(
+    text: str = Body(..., embed=True),
+    current_user: User = Depends(get_current_user)
+):
+    import os
+    folder = "user_texts"
+    os.makedirs(folder, exist_ok=True)
+    file_path = os.path.join(folder, f"user_{current_user.id}.txt")
+    try:
+        with open(file_path, "a", encoding="utf-8") as f:
+            f.write(text + "\n")
+        return {"status": "success", "file": file_path, "added_text": text}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to write to file: {e}")
