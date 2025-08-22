@@ -113,19 +113,15 @@ def test_email(email: str, message: str = "This is a test email from Medicine Re
     return {"status": "Email sent", "to": email, "message": message}
 
 
-# New endpoint: Add text to user-specific file
+# New endpoint: Add text to user-specific database row
 @app.post("/user/text")
-def add_text_to_user_file(
+def add_text_to_user_db(
     text: str = Body(..., embed=True),
+    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    import os
-    folder = "user_texts"
-    os.makedirs(folder, exist_ok=True)
-    file_path = os.path.join(folder, f"user_{current_user.id}.txt")
     try:
-        with open(file_path, "a", encoding="utf-8") as f:
-            f.write(text + "\n")
-        return {"status": "success", "file": file_path, "added_text": text}
+        user_text = crud.add_or_append_user_text(db, current_user.id, text)
+        return {"status": "success", "user_id": current_user.id, "added_text": text, "full_text": user_text.text}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to write to file: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to write to database: {e}")

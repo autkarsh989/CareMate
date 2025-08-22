@@ -13,6 +13,7 @@ class User(Base):
     reminder_type = Column(String, default="both")  # email, call, both
 
     prescriptions = relationship("Prescription", back_populates="user")
+    user_text = relationship("UserText", back_populates="user", uselist=False)
 
 class Prescription(Base):
     __tablename__ = "prescriptions"
@@ -24,3 +25,12 @@ class Prescription(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
 
     user = relationship("User", back_populates="prescriptions")
+
+
+class UserText(Base):
+    __tablename__ = "user_texts"
+
+    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
+    text = Column(String)
+
+    user = relationship("User", back_populates="user_text")
