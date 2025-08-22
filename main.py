@@ -41,6 +41,11 @@ def start_services():
     scheduler.start()
     app.state.scheduler = scheduler
 
+@app.on_event("shutdown")
+def stop_service():
+    if app.state.scheduler:
+        print("🛑 Shutting down reminder scheduler...")
+        app.state.scheduler.shutdown(wait=False)
 
 # Utility functions for authentication
 def verify_password(plain_password, hashed_password):
