@@ -7,7 +7,7 @@ sqlalchemy==2.0.21
 pydantic==2.6.1
 
 # Authentication & Security
-passlib[bcrypt]==1.7.5
+passlib[bcrypt]
 python-jose==3.3.0
 
 # Scheduling & Background tasks
