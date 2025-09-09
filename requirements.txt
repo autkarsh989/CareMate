@@ -16,6 +16,8 @@ apscheduler
 # Twilio for calls
 twilio
 
+python-multipart
+
 # Email handling
 email-validator
 
