@@ -1,8 +1,26 @@
-fastapi
-uvicorn
-sqlalchemy
-pydantic
-apscheduler
-twilio
-python-dotenv
-email-validator
+# Web framework
+fastapi==0.111.1
+uvicorn[standard]==0.23.2
+
+# Database and ORM
+sqlalchemy==2.0.21
+pydantic==2.6.1
+
+# Authentication & Security
+passlib[bcrypt]==1.7.5
+python-jose==3.3.0
+
+# Scheduling & Background tasks
+apscheduler==3.11.1
+
+# Twilio for calls
+twilio==8.18.1
+
+# Email handling
+email-validator==2.1.1
+
+# Environment variables
+python-dotenv==1.0.1
+
+# HTTP requests (for Gemini AI integration)
+requests==2.31.0
