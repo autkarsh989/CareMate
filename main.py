@@ -192,3 +192,8 @@ def ask_question(
 @app.get("/queue-status")
 def queue_status():
     return {"queue_size": reminder_queue.qsize()}
+
+
+@app.get("/hello")
+def qt():
+    return {"msg":"hi am good"}
