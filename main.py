@@ -194,6 +194,6 @@ def queue_status():
     return {"queue_size": reminder_queue.qsize()}
 
 
-@app.get("/hello")
+@app.get("/h")
 def qt():
-    return {"msg":"hi am good"}
+    return {"msg":"hi am good boy"}
